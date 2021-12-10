@@ -1,5 +1,5 @@
 
-package main
+package day1
 
 import (
     "fmt"
@@ -79,19 +79,23 @@ func f2 (r io.Reader) (int, error) {
     return z, nil
 }
 
-func main() {
-    h0, err := os.Open("input.txt")
+func RunF1(input string) {
+    h0, err := os.Open(input)
     if err != nil { return }
     defer h0.Close()
 
-    /*
     i, err := f1(h0)
     if err != nil {
         fmt.Printf("Error: %v\n", err)
         return
     }
-    fmt.Printf("%d\n", i)
-    */
+    fmt.Printf("Answer: %d\n", i)
+}
+
+func RunF2(input string) {
+    h0, err := os.Open(input)
+    if err != nil { return }
+    defer h0.Close()
 
     n, err := f2(h0)
     if err != nil {
@@ -100,3 +104,4 @@ func main() {
     }
     fmt.Printf("Answer: %d\n", n)
 }
+
