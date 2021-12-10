@@ -89,7 +89,7 @@ func RunF1(input string) {
         fmt.Printf("Error: %v\n", err)
         return
     }
-    fmt.Printf("Answer: %d\n", i)
+    fmt.Printf("Answer1: %d\n", i)
 }
 
 func RunF2(input string) {
@@ -102,6 +102,6 @@ func RunF2(input string) {
         fmt.Printf("Error: %v\n", err)
         return
     }
-    fmt.Printf("Answer: %d\n", n)
+    fmt.Printf("Answer2: %d\n", n)
 }
 
