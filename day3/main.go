@@ -67,12 +67,12 @@ func RunF1(input string) {
     if err != nil { return }
     defer h0.Close()
 
-    bc, nums, err := parseDiag(h0)
+    bc, _, err := parseDiag(h0)
     if err != nil {
         fmt.Printf("Error: %v\n", err)
         return
     }
-    fmt.Printf("bc=%v, nums=%v\n", bc, nums)
+    fmt.Printf("bc=%v\n", bc)
     gamma, epsilon := f1(bc)
     //findSimilar(gamma, nums)
     //fmt.Printf("%0b\n", (^t<<27)>>27)
@@ -91,7 +91,7 @@ func groupByBit (bit uint32, nums []uint32) (bc BitGroup) {
     bc.ones = make([]uint32, 0)
     bc.zeros = make([]uint32, 0)
     var mask uint32 = 1<<bc.bit
-    fmt.Printf("Group by bit %d with mask %d\n", bc.bit, mask)
+    //fmt.Printf("Group by bit %d with mask %d\n", bc.bit, mask)
     for _, x := range nums {
         //fmt.Printf("Num %d\n", x)
         if x&mask != 0 {
@@ -103,45 +103,37 @@ func groupByBit (bit uint32, nums []uint32) (bc BitGroup) {
     return
 }
 
-func f2 (maxBit int, allNums []uint32) (oxygen uint32, co2 uint32) {
-
-    nums := allNums
+func findNumber (maxBit int, nums []uint32, choose func(BitGroup) []uint32) uint32 {
     for i := maxBit - 1; i >= 0 && len(nums) > 1; i-- {
         //fmt.Printf("Grouping numbers %0b\n", nums)
         bg := groupByBit(uint32(i), nums)
-        if len(bg.ones) >= len(bg.zeros) {
-            nums = bg.ones
-        } else {
-            nums = bg.zeros
-        }
+        nums = choose(bg)
         //fmt.Printf("Groups by bit 2^%d are 1=%0b(%d) and 0=%0b(%d)\n", i, bg.ones, len(bg.ones), bg.zeros, len(bg.zeros))
     }
-    if len(nums) == 1 {
-        oxygen = nums[0]
-        fmt.Printf("Found number %d (%0b)\n", nums[0], nums[0])
-    } else {
-        panic("Impossible, more than one oxygen number left")
-    }
 
-    nums = allNums
-    for i := maxBit - 1; i >= 0 && len(nums) > 1; i-- {
-        fmt.Printf("Grouping numbers %0b\n", nums)
-        bg := groupByBit(uint32(i), nums)
-        if len(bg.ones) >= len(bg.zeros) {
-            nums = bg.zeros
-        } else {
-            nums = bg.ones
-        }
-        fmt.Printf("Groups by bit 2^%d are 1=%0b(%d) and 0=%0b(%d)\n",
-            i, bg.ones, len(bg.ones), bg.zeros, len(bg.zeros))
-    }
-    fmt.Printf("Left %0b\n", nums)
     if len(nums) == 1 {
-        co2 = nums[0]
-        fmt.Printf("Found number %d (%0b)\n", nums[0], nums[0])
-    } else {
-        panic("Impossible, more than one co2 number left")
+        //fmt.Printf("Found number %d (%0b)\n", nums[0], nums[0])
+        return nums[0]
     }
+    panic("Impossible, more than one number left.")
+}
+
+func f2 (maxBit int, nums []uint32) (oxygen uint32, co2 uint32) {
+    mostCommon := func (gr BitGroup) []uint32 {
+        if len(gr.ones) >= len(gr.zeros) {
+            return gr.ones
+        }
+        return gr.zeros
+    }
+    oxygen = findNumber(maxBit, nums, mostCommon)
+
+    leastCommon := func (gr BitGroup) []uint32 {
+        if len(gr.ones) >= len(gr.zeros) {
+            return gr.zeros
+        }
+        return gr.ones
+    }
+    co2 = findNumber(maxBit, nums, leastCommon)
 
     return
 }
@@ -156,8 +148,8 @@ func RunF2(input string) {
         fmt.Printf("Error: %v\n", err)
         return
     }
-    fmt.Printf("bc=%v, nums=%v (%d)\n", bc, nums, len(nums))
+    //fmt.Printf("bc=%v, nums=%v (%d)\n", bc, nums, len(nums))
     oxygen, co2 := f2(len(bc), nums)
-    fmt.Printf("Answer1: %d (%d, %d)\n", oxygen * co2, oxygen, co2)
+    fmt.Printf("Answer2: %d (%d, %d)\n", oxygen * co2, oxygen, co2)
 
 }
