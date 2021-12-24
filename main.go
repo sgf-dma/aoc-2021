@@ -13,5 +13,5 @@ func main() {
     //day3.RunF2("day3/input.txt")
     //day3.RunF2("day2/input.txt")
     day4.RunF1("day4/input.txt")
-    //day4.RunF1("day4/in.txt")
+    day4.RunF2("day4/input.txt")
 }

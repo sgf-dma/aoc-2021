@@ -52,6 +52,7 @@ type Board struct {
     board [5][5]int
     markedCol  [5]int
     markedLine [5]int
+    won bool
 }
 
 func readBoard(s *bufio.Scanner) (b Board, err error) {
@@ -63,10 +64,10 @@ func readBoard(s *bufio.Scanner) (b Board, err error) {
     i := 0
     for ; i < 5 && notEOF; i++ {
         c := s.Text()
-        fmt.Printf("Read %v\n", c)
+        //fmt.Printf("Read %v\n", c)
         b.board[i], err = readBoardLine(c)
         if err != nil { return }
-        fmt.Printf("Read board row %v\n", b.board[i])
+        //fmt.Printf("Read board row %v\n", b.board[i])
         notEOF = s.Scan()
     }
     if i < 5 {
@@ -88,7 +89,7 @@ func readInput(r io.Reader) (drawn []int, boards []Board, err error) {
 
     drawn, err = readDrawn(s)
     if err != nil { return }
-    fmt.Printf("Read drawn %v\n", drawn)
+    //fmt.Printf("Read drawn %v\n", drawn)
 
     boards = make([]Board, 0)
     notEOF := true
@@ -96,7 +97,7 @@ func readInput(r io.Reader) (drawn []int, boards []Board, err error) {
         var board Board
         board, err = readBoard(s)
         if err != nil { return }
-        fmt.Printf("Read board %v\n", board)
+        //fmt.Printf("Read board %v\n", board)
         boards = append(boards, board)
 
         if len(s.Text()) == 0 { notEOF = s.Scan() }
@@ -106,22 +107,23 @@ func readInput(r io.Reader) (drawn []int, boards []Board, err error) {
 
 var marked int = -1
 
-func (b *Board) markNumber(drawn int) bool {
-    fmt.Printf("Marking %d in board %v (%v %v)\n", drawn, b.board, b.markedLine, b.markedCol)
+func (b *Board) markNumber(drawn int) {
+    //fmt.Printf("Marking %d in board %v (%v %v)\n", drawn, b.board, b.markedLine, b.markedCol)
     for i := 0; i < 5; i++ {
         for j := 0; j < 5; j++  {
             if b.board[i][j] == drawn {
-                fmt.Printf("Found at line %d, col %d\n", i, j)
+                //fmt.Printf("Found at line %d, col %d\n", i, j)
                 b.board[i][j] = marked
                 b.markedCol[j]++
                 b.markedLine[i]++
                 if b.markedCol[j] == 5 || b.markedLine[i] == 5 {
-                    return true
+                    b.won = true
+                    return
                 }
             }
         }
     }
-    return false
+    return
 }
 
 func (b Board) sumBoard() (s int) {
@@ -137,18 +139,43 @@ func (b Board) sumBoard() (s int) {
 
 func f1 (drawn []int, bs []Board) int {
     for _, k := range drawn {
-        fmt.Printf("Draw %d\n", k)
+        //fmt.Printf("Draw %d\n", k)
         for t := 0; t < len(bs); t++ {
-            isWinner := bs[t].markNumber(k)
-            fmt.Printf("Resulting board %d: %v\n", t, bs[t])
-            if isWinner {
+            bs[t].markNumber(k)
+            //fmt.Printf("Resulting board %d: %v\n", t, bs[t])
+            if bs[t].won {
                 s := bs[t].sumBoard()
-                fmt.Printf("Winner board %d: %v with sum %d\n", t, bs[t], s)
+                //fmt.Printf("Winner board %d: %v with sum %d\n", t, bs[t], s)
                 return k * s
             }
         }
     }
-    return 0
+    return marked
+}
+
+func f2 (drawn []int, bs []Board) int {
+    remainingBoards := len(bs)
+    for _, k := range drawn {
+        //fmt.Printf("Draw %d\n", k)
+        last := marked
+        winners := 0
+        for t := 0; t < len(bs); t++ {
+            if bs[t].won { continue }
+            bs[t].markNumber(k)
+            //fmt.Printf("Resulting board %d: %v\n", t, bs[t])
+            if bs[t].won {
+                s := bs[t].sumBoard()
+                //fmt.Printf("Winner board %d: %v with sum %d\n", t, bs[t], s)
+                last = k * s
+                winners++
+            }
+        }
+        remainingBoards -= winners
+        if remainingBoards == 0 {
+            return last
+        }
+    }
+    return marked
 }
 
 func RunF1(input string) {
@@ -162,8 +189,20 @@ func RunF1(input string) {
     if err != nil {
         panic(err)
     }
-    fmt.Println(boards)
+    //fmt.Println(boards)
     x := f1(nums, boards)
-
     fmt.Printf("Answer1: %d\n", x)
+}
+
+func RunF2(input string) {
+    h0, err := os.Open(input)
+    if err != nil { return }
+    defer h0.Close()
+
+    nums, boards, err := readInput(h0)
+    if err != nil {
+        panic(err)
+    }
+    y := f2(nums, boards)
+    fmt.Printf("Answer2: %d\n", y)
 }
