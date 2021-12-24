@@ -106,7 +106,7 @@ func readInput(r io.Reader) (drawn []int, boards []Board, err error) {
 
 var marked int = -1
 
-func markNumber(drawn int, b *Board) bool {
+func (b *Board) markNumber(drawn int) bool {
     fmt.Printf("Marking %d in board %v (%v %v)\n", drawn, b.board, b.markedLine, b.markedCol)
     for i := 0; i < 5; i++ {
         for j := 0; j < 5; j++  {
@@ -124,8 +124,8 @@ func markNumber(drawn int, b *Board) bool {
     return false
 }
 
-func sumBoard(b Board) (s int) {
-    fmt.Printf("Summing board board %v\n", b.board)
+func (b Board) sumBoard() (s int) {
+    //fmt.Printf("Summing board board %v\n", b.board)
     for i := 0; i < 5; i++ {
         for j := 0; j < 5; j++  {
             if b.board[i][j] == marked { continue }
@@ -139,10 +139,10 @@ func f1 (drawn []int, bs []Board) int {
     for _, k := range drawn {
         fmt.Printf("Draw %d\n", k)
         for t := 0; t < len(bs); t++ {
-            isWinner := markNumber(k, &bs[t])
+            isWinner := bs[t].markNumber(k)
             fmt.Printf("Resulting board %d: %v\n", t, bs[t])
             if isWinner {
-                s := sumBoard(bs[t])
+                s := bs[t].sumBoard()
                 fmt.Printf("Winner board %d: %v with sum %d\n", t, bs[t], s)
                 return k * s
             }
