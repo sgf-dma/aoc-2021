@@ -10,5 +10,6 @@ import (
 )
 
 func main() {
-    day5.RunF1("day5/input.txt")
+    day5.RunF1("day5/in.txt")
+    day5.RunF2("day5/in.txt")
 }

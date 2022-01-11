@@ -108,10 +108,15 @@ func min(x, y int) (v int){
     return
 }
 
+func abs(x float64) float64 {
+    if x < 0  { return -x }
+    return x
+}
+
 func (m *Matrix) drawLines(lines []Line) {
     for _, l := range lines {
         if l.start.x == l.end.x {
-            //fmt.Printf("Draw vertical line %v on\n%v\n", l, m)
+            //fmt.Printf("Draw vertical line %v on %v\n", l, m)
 
             m.hasPoint(l.start)
             m.hasPoint(l.end)
@@ -121,11 +126,11 @@ func (m *Matrix) drawLines(lines []Line) {
             for ; y <= max(l.start.y, l.end.y); y++ {
                 //fmt.Printf("draw [%v][%v]\n", x, y)
                 m.data[y][x]++
-                //fmt.Printf("Matrix\n%v\n", m)
+                //fmt.Printf("Matrix %v\n", m)
             }
             //fmt.Printf("Drawn \n%v\n", m)
         } else if l.start.y == l.end.y {
-            //fmt.Printf("Draw horizontal line %v on\n%v\n", l, m)
+            //fmt.Printf("Draw horizontal line %v on %v\n", l, m)
 
             m.hasPoint(l.start)
             m.hasPoint(l.end)
@@ -135,6 +140,52 @@ func (m *Matrix) drawLines(lines []Line) {
             for ; x <= max(l.start.x, l.end.x); x++ {
                 m.data[y][x]++
             }
+        } else {
+            //fmt.Printf("Skip point %v\n", l)
+        }
+    }
+}
+
+func (m *Matrix) drawLines2(lines []Line) {
+    for _, l := range lines {
+        if l.start.x == l.end.x {
+            //fmt.Printf("Draw vertical line %v on %v\n", l, m)
+
+            m.hasPoint(l.start)
+            m.hasPoint(l.end)
+
+            x := l.start.x
+            y := min(l.start.y, l.end.y)
+            for ; y <= max(l.start.y, l.end.y); y++ {
+                //fmt.Printf("draw [%v][%v]\n", x, y)
+                m.data[y][x]++
+                //fmt.Printf("Matrix %v\n", m)
+            }
+            //fmt.Printf("Drawn \n%v\n", m)
+        }
+
+        kf := float64(l.end.y - l.start.y) / float64(l.end.x - l.start.x)
+        //fmt.Printf("Line %v (k = %v)\n", l, kf)
+
+        if abs(kf) == 1 || kf == 0 {
+
+            m.hasPoint(l.start)
+            m.hasPoint(l.end)
+
+            k := int(kf)
+            b := l.start.y - k * l.start.x
+            //fmt.Printf("Draw line %v (k = %v, b = %v)\n", l, k, b)
+            //fmt.Printf("Over matrix %v\n", m)
+            for x := min(l.start.x, l.end.x); x <= max(l.start.x, l.end.x); x++ {
+                y := k*x + b
+                //fmt.Printf("draw [%v][%v]\n", x, y)
+
+                m.data[y][x]++
+                //fmt.Printf("Matrix %v\n", m)
+            }
+            //fmt.Printf("Drawn matrix %v\n", m)
+        } else {
+            //fmt.Printf("Skipping line %v\n", l)
         }
     }
 }
@@ -143,6 +194,20 @@ func f1(lines []Line) (count int) {
     var m Matrix
 
     m.drawLines(lines)
+    fmt.Printf("rows %v, cols %v\n", m.rows, m.cols)
+    for y := 0; y < m.rows; y++ {
+        for x := 0; x < m.cols; x++ {
+            if m.data[y][x] > 1 { count++ }
+        }
+    }
+    return count
+}
+
+func f2(lines []Line) (count int) {
+    var m Matrix
+
+    m.drawLines2(lines)
+    fmt.Printf("rows %v, cols %v\n", m.rows, m.cols)
     for y := 0; y < m.rows; y++ {
         for x := 0; x < m.cols; x++ {
             if m.data[y][x] > 1 { count++ }
@@ -178,10 +243,20 @@ func RunF1(input string) {
     ls, err := readInput(h0)
     fmt.Printf("Input %v\n", ls)
 
-    var m Matrix
-    m.drawLines(ls)
     count := f1(ls)
     //fmt.Printf("Matrix %v\n", m)
     fmt.Printf("Answer1: %v\n", count)
 }
 
+func RunF2(input string) {
+    h0, err := os.Open(input)
+    if err != nil { return }
+    defer h0.Close()
+
+    ls, err := readInput(h0)
+    fmt.Printf("Input %v\n", ls)
+
+    count := f2(ls)
+    //fmt.Printf("Matrix %v\n", m)
+    fmt.Printf("Answer2: %v\n", count)
+}
