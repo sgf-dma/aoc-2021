@@ -74,7 +74,7 @@ func RunF1(input string) {
         ages = oneDay(ages)
         fmt.Printf("Day %v: %v\n", d, ages)
     }*/
-    for d := 0; d < 200; d++ {
+    for d := 0; d < 80; d++ {
         ages = oneDay(ages)
         //fmt.Printf("Day %v: %v\n", d, ages)
     }
