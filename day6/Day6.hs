@@ -153,6 +153,7 @@ fishesL ages n
 readInput :: FilePath -> IO [Int]
 readInput = fmap (map read . wordsBy (== ',')) . readFile
 
+-- FIXME: Too slow. Use Vector? Or add strictness?
 runF1 :: FilePath -> IO ()
 runF1 fp = do
     ages <- readInput fp
