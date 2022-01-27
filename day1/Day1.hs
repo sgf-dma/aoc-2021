@@ -1,3 +1,10 @@
+
+module Day1
+    ( runF1
+    , runF2
+    )
+  where
+
 f1 :: [Int] -> Int
 f1 [] = 0
 -- y x(cur)
@@ -17,9 +24,16 @@ f2 (k1 : k2 : ks) = fst $ foldr go (\_ _ -> (0, 0)) ks k1 k2
         cur = w + y + x
      in if next > cur then (n + 1, cur) else (n, cur)
 
-main :: IO ()
-main = do
-  c <- readFile "day1/input.txt"
-  let xs = map read (lines c)
-  print $ "Answer1: " ++ show (f1 xs)
-  print $ "Answer2: " ++ show (f2 xs)
+readInput :: FilePath -> IO [Int]
+readInput = fmap (map read . lines) . readFile
+
+runF1 :: FilePath -> IO ()
+runF1 fp = do
+    xs <- readInput fp
+    print $ "Answer1: " ++ show (f1 xs)
+
+runF2 :: FilePath -> IO ()
+runF2 fp = do
+    xs <- readInput fp
+    print $ "Answer2: " ++ show (f2 xs)
+

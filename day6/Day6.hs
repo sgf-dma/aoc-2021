@@ -1,4 +1,9 @@
 
+module Day6
+    ( runF1
+    )
+  where
+
 import Control.Comonad
 import Control.Comonad.Traced
 import Data.Function
@@ -153,7 +158,4 @@ runF1 fp = do
     ages <- readInput fp
     let ys = fishesF ages 80
     print $ "Answer1: " ++ show (length ys)
-
-main :: IO ()
-main = runF1 "day6/input.txt"
 
