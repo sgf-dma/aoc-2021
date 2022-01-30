@@ -81,3 +81,22 @@ func RunF1(input string) {
 
     fmt.Printf("Answer1: %v\n", len(ages))
 }
+
+func RunF2(input string) {
+    h0, err := os.Open(filepath.Join("day6", input))
+    if err != nil { return }
+    defer h0.Close()
+
+    ages, err := readInput(h0)
+    /*
+    for d := 0; d < 18; d++ {
+        ages = oneDay(ages)
+        fmt.Printf("Day %v: %v\n", d, ages)
+    }*/
+    for d := 0; d < 256; d++ {
+        ages = oneDay(ages)
+        //fmt.Printf("Day %v: %v\n", d, ages)
+    }
+
+    fmt.Printf("Answer2: %v\n", len(ages))
+}
