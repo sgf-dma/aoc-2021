@@ -63,9 +63,9 @@ func oneDay(ages []BirthTimer) ([]BirthTimer) {
     return ages
 }
 
-func RunF1(input string) {
+func RunF1Days(input string, days int) int {
     h0, err := os.Open(filepath.Join("day6", input))
-    if err != nil { return }
+    if err != nil { return 0 }
     defer h0.Close()
 
     ages, err := readInput(h0)
@@ -74,12 +74,18 @@ func RunF1(input string) {
         ages = oneDay(ages)
         fmt.Printf("Day %v: %v\n", d, ages)
     }*/
-    for d := 0; d < 80; d++ {
+    //for d := 0; d < 80; d++ {
+    for d := 0; d < days; d++ {
         ages = oneDay(ages)
         //fmt.Printf("Day %v: %v\n", d, ages)
     }
 
-    fmt.Printf("Answer1: %v\n", len(ages))
+    return len(ages)
+}
+
+func RunF1 (input string) {
+    n := RunF1Days(input, 80)
+    fmt.Printf("Answer1: %v\n", n)
 }
 
 type Fish struct {
@@ -101,53 +107,54 @@ func readInput2(r io.Reader) (fishes []Fish, err error) {
 }
 
 func live(fish *Fish) {
-    if fish.age < 8 {
+    if fish.age < 9 {
         return
     }
-    fmt.Printf("   Fish: %v\n", fish)
-    fish.age -= 1
+    //fmt.Printf("   Fish: %v\n", fish)
+    fish.age -= 2
     for fish.age >= 7 {
         fish.age -= 7
         fish.childs = append(fish.childs, Fish{age: fish.age})
-        fmt.Printf("   Fish child: %v\n", fish)
+        //fmt.Printf("   Fish child: %v\n", fish)
     }
 }
 
 func liveDescendants(fish *Fish) {
     live(fish)
-    fmt.Printf("Fish lived: %v\n", fish)
+    //fmt.Printf("Fish lived: %v\n", fish)
     for i := 0; i < len(fish.childs); i++ {
-        fmt.Printf("Living descendant %d\n", i)
+        //fmt.Printf("Living descendant %d\n", i)
         liveDescendants(&fish.childs[i])
     }
 }
 
-func calculateAge(bt BirthTimer, days int) int {
-    return 8 - int(bt) + days
+func countNodes(fish Fish) int {
+    n := 1
+    for i := range fish.childs {
+        n += countNodes(fish.childs[i])
+    }
+    return n
 }
 
-func RunF2(input string) {
+func RunF2Days(input string, days int) int {
     h0, err := os.Open(filepath.Join("day6", input))
-    if err != nil { return }
+    if err != nil { return 0 }
     defer h0.Close()
 
     fishes, err := readInput2(h0)
-    fmt.Printf("Starting with fishes: %v\n", fishes)
-    for _, x := range fishes[:1] {
-        fmt.Printf("### Live top-level fish %v\n", x)
-        x.age = x.age + 9
+    //fmt.Printf("Starting with fishes: %v\n", fishes)
+    n := 0
+    for _, x := range fishes {
+        //fmt.Printf("### Live top-level fish %v\n", x)
+        x.age = x.age + days
         liveDescendants(&x)
+        n += countNodes(x)
     }
-    /*
-    for d := 0; d < 18; d++ {
-        ages = oneDay(ages)
-        fmt.Printf("Day %v: %v\n", d, ages)
-    }*/
-    /*
-    for d := 0; d < 18; d++ {
-        ages = oneDay(ages)
-        //fmt.Printf("Day %v: %v\n", d, ages)
-    }*/
+    //fmt.Printf("Nodes: %v\n", n)
+    return n
+}
 
-    //fmt.Printf("Answer2: %v\n", len(ages))
+func RunF2(input string) {
+    n := RunF2Days(input, 80)
+    fmt.Printf("Nodes: %v\n", n)
 }
